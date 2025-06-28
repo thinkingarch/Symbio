@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symbiotic - Your Inner Development Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to complement Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a sleeker look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a8a29e; /* stone-400 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #78716c; /* stone-500 */
+        }
+        /* Style for the view transitions */
+        .view {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .view.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Specific styling for the large dimension icons */
+        .dimension-icon svg {
+            width: 60%;
+            height: 60%;
+            transition: transform 0.3s ease;
+        }
+        .dimension-card:hover .dimension-icon svg {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 antialiased">
+
+    <!-- Main Container -->
+    <div id="app" class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- App Header -->
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-amber-900">Symbiotic</h1>
+            <p class="text-stone-500 mt-2 text-lg">Your AI-augmented journey for Inner Development</p>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="main-content">
+
+            <!-- Home View: Displaying the 5 IDG Dimensions -->
+            <section id="home-view" class="view active">
+                <h2 class="text-2xl font-semibold text-center mb-8 text-stone-700">Choose a dimension to explore</h2>
+                <div id="dimensions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <!-- Dimension cards will be dynamically inserted here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Dimension Detail View: Displaying skills for a selected dimension -->
+            <section id="dimension-detail-view" class="view">
+                <div class="mb-6">
+                    <button onclick="showView('home-view')" class="text-amber-800 hover:text-amber-900 font-semibold flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        Back to Dimensions
+                    </button>
+                </div>
+                <div id="dimension-header" class="text-center mb-8">
+                    <!-- Dimension icon and title will be inserted here -->
+                </div>
+                <div id="skills-list" class="space-y-4">
+                    <!-- Skills will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Skill Detail View: The learning module for a specific skill -->
+            <section id="skill-detail-view" class="view">
+                 <div class="mb-6">
+                    <button id="back-to-skills-btn" class="text-amber-800 hover:text-amber-900 font-semibold flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                        Back to Skills
+                    </button>
+                </div>
+                <div id="skill-content" class="bg-white p-6 md:p-8 rounded-2xl shadow-lg">
+                    <!-- Skill learning content will be inserted here -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // --- DATA: The core content for the IDG App ---
+        // This object holds all the data for the 5 dimensions and 23 skills,
+        // making the app content-driven and easy to update.
+        const idgData = {
+            dimensions: [
+                {
+                    id: 'being',
+                    title: 'Being',
+                    subtitle: 'Relationship to Self',
+                    color: 'bg-orange-200',
+                    textColor: 'text-orange-900',
+                    icon: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 25C50 25 58.3333 16.6667 70.8333 16.6667C83.3333 16.6667 91.6667 29.1667 91.6667 41.6667C91.6667 62.5 50 83.3333 50 83.3333C50 83.3333 8.33334 62.5 8.33334 41.6667C8.33334 29.1667 16.6667 16.6667 29.1667 16.6667C41.6667 16.6667 50 25 50 25Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 54.1667C56.9036 54.1667 62.5 48.5702 62.5 41.6667C62.5 34.7631 56.9036 29.1667 50 29.1667C43.0964 29.1667 37.5 34.7631 37.5 41.6667C37.5 48.5702 43.0964 54.1667 50 54.1667Z" stroke="currentColor" stroke-width="5"/></svg>`,
+                    skills: [
+                        { id: 'inner-compass', title: 'Inner Compass', description: 'A deeply felt sense of responsibility and commitment to values that serve the good of the whole.', practice: 'Before starting a major task today, pause for 60 seconds. Ask yourself: "How does this task align with what I value most?" Write down one word.', reflection: 'When was the last time you felt truly aligned with your actions, and what were you doing?', coachPrompt: 'How can I strengthen my Inner Compass during a busy workday?' },
+                        { id: 'integrity', title: 'Integrity and Authenticity', description: 'The commitment and ability to act with sincerity, honesty, and alignment between values and actions.', practice: 'In your next team meeting, notice if there’s a moment you feel hesitant to speak your mind. Reflect on what holds you back. If appropriate, share your thought constructively.', reflection: 'In what situations do you find it easiest or hardest to be your authentic self?', coachPrompt: 'Give me a simple exercise to practice authenticity.'},
+                        { id: 'openness', title: 'Openness and Learning Mindset', description: 'A fundamental curiosity and willingness to be vulnerable, embrace change, and see challenges as opportunities for growth.', practice: 'When you encounter a problem today, actively seek out a perspective from someone you don\'t usually work with. Listen without interrupting.', reflection: 'Think of a past "failure." What was the most valuable lesson you learned from it?', coachPrompt: 'How can I cultivate a learning mindset when I feel resistant to feedback?'},
+                        { id: 'self-awareness', title: 'Self-awareness', description: 'The ability to be in reflective contact with our own thoughts, feelings, and desires.', practice: 'Set a timer for three random times today. When it goes off, pause and label your current emotion (e.g., "anxious," "calm," "focused"). No judgment, just observation.', reflection: 'What physical sensations in your body often signal a particular emotion for you (e.g., tight shoulders for stress)?', coachPrompt: 'What’s a good starting point for becoming more self-aware?'},
+                        { id: 'presence', title: 'Presence', description: 'The ability to be fully in the here and now, without judgment, in a state of open-ended awareness.', practice: 'During your lunch break, put away your phone. Pay full attention to the taste, texture, and smell of your food for just five minutes.', reflection: 'When during your day do you feel most present? When do you feel most distracted?', coachPrompt: 'I struggle with staying present in meetings. Any tips?'},
+                    ]
+                },
+                {
+                    id: 'thinking',
+                    title: 'Thinking',
+                    subtitle: 'Cognitive Skills',
+                    color: 'bg-sky-200',
+                    textColor: 'text-sky-900',
+                    icon: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75 41.6667C75 50.3709 70.0829 58.114 62.5 62.5V75H37.5V62.5C29.9171 58.114 25 50.3709 25 41.6667C25 27.4246 36.1726 16.6667 50 16.6667C63.8274 16.6667 75 27.4246 75 41.6667Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 75V83.3333" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M37.5 83.3333H62.5" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 45.8333C52.3012 45.8333 54.1667 43.9678 54.1667 41.6667C54.1667 39.3654 52.3012 37.5 50 37.5C47.6988 37.5 45.8333 39.3654 45.8333 41.6667C45.8333 43.9678 47.6988 45.8333 50 45.8333Z" stroke="currentColor" stroke-width="5"/></svg>`,
+                    skills: [
+                        { id: 'critical-thinking', title: 'Critical Thinking', description: 'The ability to critically review the validity of views, evidence, and plans.', practice: 'The next time you read a news article or report, ask: "What is the primary assumption here? What evidence is missing?"', reflection: 'Recall a time you changed your mind about something important. What caused the shift?', coachPrompt: 'How can I use you to challenge my own assumptions?'},
+                        { id: 'complexity-awareness', title: 'Complexity Awareness', description: 'Understanding and skill in working with complex and systemic conditions.', practice: 'Pick a problem at work. Instead of a simple cause-and-effect, try to map at least three interconnected factors that contribute to it.', reflection: 'What is a "simple" problem that turned out to be far more complex than you first thought?', coachPrompt: 'Can you help me visualize the ripple effects of a decision?'},
+                        { id: 'perspective-skills', title: 'Perspective Skills', description: 'The ability to actively seek, understand, and make use of insights from contrasting perspectives.', practice: 'In your next disagreement, genuinely try to argue the other person\'s point of view to yourself. What new insights emerge?', reflection: 'Whose perspective do you find it most challenging to understand, and why?', coachPrompt: 'Explain a controversial topic from three different viewpoints.'},
+                        { id: 'sense-making', title: 'Sense-making', description: 'The skill of seeing patterns, structuring the unknown, and creating coherent narratives from complex information.', practice: 'At the end of your workday, take 5 minutes to connect the dots. Write down the three most important things that happened and how they relate to each other.', reflection: 'How do you typically organize information when you feel overwhelmed by it?', coachPrompt: 'Help me find the key themes in a large amount of text.'},
+                        { id: 'long-term-orientation', title: 'Long-term Orientation', description: 'The ability to think beyond immediate pressures and sustain commitment to larger visions.', practice: 'When making a decision today, ask: "What would my future self in 5 years advise me to do right now?"', reflection: 'What is a long-term goal you are working towards, and what is one small step you can take today?', coachPrompt: 'How can I balance short-term demands with long-term goals?'},
+                    ]
+                },
+                {
+                    id: 'relating',
+                    title: 'Relating',
+                    subtitle: 'Caring for Others and the World',
+                    color: 'bg-teal-200',
+                    textColor: 'text-teal-900',
+                    icon: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 62.5C62.5939 62.5 72.9167 52.1772 72.9167 39.5833C72.9167 27 62.5939 16.6667 50 16.6667C37.4061 16.6667 27.0833 27 27.0833 39.5833C27.0833 45.4167 29.8958 50.5208 34.375 54.1667" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 83.3333C25 72.2878 36.1929 62.5 50 62.5C57.4477 62.5 64.1283 66.2519 68.75 71.875" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M75 83.3333C75 74.5292 68.9749 67.2917 61.4583 64.5833" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                    skills: [
+                        { id: 'appreciation', title: 'Appreciation', description: 'The ability to relate to others and the world with a basic sense of gratitude and recognition of value.', practice: 'At the end of the day, write down one thing a colleague did that you appreciated. If you feel comfortable, share it with them tomorrow.', reflection: 'What is something simple you often take for granted?', coachPrompt: 'Suggest a small way to show more appreciation at work.' },
+                        { id: 'connectedness', title: 'Connectedness', description: 'A keen sense of being part of a larger whole, whether a community, humanity, or the global ecosystem.', practice: 'Look at an everyday object on your desk. Take a moment to think about the hundreds of people involved in its creation and journey to you.', reflection: 'When have you felt most connected to a group or a cause?', coachPrompt: 'How can I feel more connected to my team\'s mission?'},
+                        { id: 'humility', title: 'Humility', description: 'The capacity to act in accordance with the needs of a situation without being driven by ego.', practice: 'In your next conversation, focus on listening more than you speak. Ask questions to understand, not to respond.', reflection: 'When is it difficult for you to admit you don\'t know something?', coachPrompt: 'What’s the difference between humility and a lack of confidence?'},
+                        { id: 'empathy', title: 'Empathy and Compassion', description: 'The ability to understand and feel into the experience of others, coupled with the motivation to help.', practice: 'When a colleague seems stressed, instead of offering a solution, try saying: "It sounds like this is really challenging. How are you doing with it?"', reflection: 'Think about a time someone showed you empathy. What did they do or say that made a difference?', coachPrompt: 'I want to practice empathy. Simulate a scenario for me.'},
+                    ]
+                },
+                {
+                    id: 'collaborating',
+                    title: 'Collaborating',
+                    subtitle: 'Social Skills',
+                    color: 'bg-amber-200',
+                    textColor: 'text-amber-900',
+                    icon: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M33.3333 58.3333C40.9137 58.3333 46.9444 52.3026 46.9444 44.7222C46.9444 37.1418 40.9137 31.1111 33.3333 31.1111C25.7529 31.1111 19.7222 37.1418 19.7222 44.7222C19.7222 52.3026 25.7529 58.3333 33.3333 58.3333Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.6667 80.2778V76.1111C16.6667 66.2731 24.162 58.3333 33.3333 58.3333" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M66.6667 58.3333C74.2471 58.3333 80.2778 52.3026 80.2778 44.7222C80.2778 37.1418 74.2471 31.1111 66.6667 31.1111C59.0863 31.1111 53.0556 37.1418 53.0556 44.7222C53.0556 52.3026 59.0863 58.3333 66.6667 58.3333Z" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M83.3333 80.2778V76.1111C83.3333 66.2731 75.838 58.3333 66.6667 58.3333C61.4729 58.3333 56.8407 60.7712 53.8889 64.4444" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M33.3333 58.3333C38.5271 58.3333 43.1593 60.7712 46.1111 64.4444" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                    skills: [
+                        { id: 'communication-skills', title: 'Communication Skills', description: 'The ability to listen deeply, foster genuine dialogue, and manage conflict constructively.', practice: 'In your next conversation, after the other person finishes speaking, pause for a count of three before you respond. Use that time to fully absorb what they said.', reflection: 'What communication habit do you have that you\'d like to improve?', coachPrompt: 'Give me a phrase I can use to de-escalate a tense conversation.'},
+                        { id: 'co-creation-skills', title: 'Co-creation Skills', description: 'Skills to build and facilitate collaborative relationships characterized by psychological safety.', practice: 'Start your next project meeting by asking: "What does a great outcome look like for each of us?" and build from the shared understanding.', reflection: 'Think of your best-ever collaboration. What made it so effective?', coachPrompt: 'How can I create psychological safety in my team?'},
+                        { id: 'inclusive-mindset', title: 'Inclusive Mindset', description: 'The willingness and competence to embrace diversity and include people with different backgrounds.', practice: 'During a team discussion, consciously look for the person who has spoken the least and invite their opinion: "Sarah, we haven\'t heard from you yet, what are your thoughts?"', reflection: 'Whose voices or perspectives might be missing from your team\'s decision-making process?', coachPrompt: 'What is one common mistake people make when trying to be inclusive?'},
+                        { id: 'trust', title: 'Trust', description: 'The ability to both show trust and to create and maintain trusting relationships.', practice: 'Delegate a task to a colleague and give them full autonomy on the "how". Focus on the "what" (the outcome), not micromanaging the process.', reflection: 'What actions build your trust in others? What actions erode it?', coachPrompt: 'How can I rebuild trust after a misunderstanding?'},
+                        { id: 'mobilization-skills', title: 'Mobilization Skills', description: 'The ability to inspire and engage others to work toward a shared purpose.', practice: 'Connect a colleague\'s daily task to the team\'s larger mission. For example, "The care you\'re putting into this report is crucial for our client\'s success."', reflection: 'Who is someone that inspires you to act, and what is it about them that is so motivating?', coachPrompt: 'I need to motivate my team for a difficult project. What’s the first step?'},
+                    ]
+                },
+                {
+                    id: 'acting',
+                    title: 'Acting',
+                    subtitle: 'Driving Change',
+                    color: 'bg-red-200',
+                    textColor: 'text-red-900',
+                    icon: `<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M41.6667 16.6667L62.5 50L41.6667 83.3333" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M25 83.3333H75" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+                    skills: [
+                        { id: 'courage', title: 'Courage', description: 'The ability to stand up for values, make decisions, and challenge existing structures when necessary.', practice: 'Identify one small, necessary but uncomfortable action you have been avoiding. Dedicate 15 minutes today to starting it.', reflection: 'When was a time you acted with courage, even if you were afraid? What was the outcome?', coachPrompt: 'How can I find the courage to speak up about something I believe in?'},
+                        { id: 'creativity', title: 'Creativity', description: 'The ability to generate and develop original ideas, innovate, and disrupt conventional patterns.', practice: 'Take a routine task you do every day. Ask yourself: "What if I did this in a completely different way?" Brainstorm three absurd ideas.', reflection: 'Where do you get your best ideas?', coachPrompt: 'Give me a creative prompt to help me think differently about a problem.'},
+                        { id: 'optimism', title: 'Optimism', description: 'The capacity to sustain and communicate a sense of hope and confidence in the possibility of meaningful change.', practice: 'When faced with a setback today, consciously identify one opportunity or lesson within the challenge.', reflection: 'Who in your life is a source of optimism for you, and why?', coachPrompt: 'How can I be optimistic without ignoring real problems?'},
+                        { id: 'perseverance', title: 'Perseverance', description: 'The ability to sustain engagement and remain determined and patient, even when efforts take a long time to bear fruit.', practice: 'Acknowledge a long-term goal you\'re working on. Today, simply do the "next small thing" on that path, no matter how small.', reflection: 'What keeps you going when you feel like giving up on a difficult project?', coachPrompt: 'I’m losing motivation on a long project. How can I regain it?'},
+                    ]
+                }
+            ]
+        };
+
+        // --- GLOBAL STATE ---
+        // Keeps track of the current view and selected items to navigate the app
+        let currentState = {
+            currentView: 'home-view',
+            selectedDimensionId: null,
+            selectedSkillId: null,
+        };
+
+        // --- CORE FUNCTIONS ---
+
+        /**
+         * The main navigation function. It hides all views and shows only the target view.
+         * @param {string} viewId - The ID of the view to display (e.g., 'home-view', 'skill-detail-view').
+         */
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            currentState.currentView = viewId;
+            window.scrollTo(0, 0); // Scroll to top on view change
+        }
+
+        /**
+         * Renders the main dashboard with the 5 dimension cards.
+         * This function is called once when the app loads.
+         */
+        function renderHomeView() {
+            const grid = document.getElementById('dimensions-grid');
+            grid.innerHTML = ''; // Clear existing content
+            idgData.dimensions.forEach(dim => {
+                const card = document.createElement('div');
+                card.className = `dimension-card ${dim.color} p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-300 cursor-pointer flex flex-col items-center text-center`;
+                card.onclick = () => showDimensionDetail(dim.id);
+
+                card.innerHTML = `
+                    <div class="dimension-icon w-24 h-24 md:w-32 md:h-32 mb-4 ${dim.textColor} flex items-center justify-center">
+                        ${dim.icon}
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-bold ${dim.textColor}">${dim.title}</h3>
+                    <p class="text-sm ${dim.textColor} opacity-80">${dim.subtitle}</p>
+                `;
+                grid.appendChild(card);
+            });
+            // Adjust grid for 5 items to look better on lg screens
+            const placeholder = document.createElement('div');
+            placeholder.className = 'hidden lg:block';
+            grid.appendChild(placeholder);
+        }
+
+        /**
+         * Renders the detail view for a specific dimension, showing its skills.
+         * @param {string} dimensionId - The ID of the dimension to display.
+         */
+        function showDimensionDetail(dimensionId) {
+            currentState.selectedDimensionId = dimensionId;
+            const dimension = idgData.dimensions.find(d => d.id === dimensionId);
+
+            const header = document.getElementById('dimension-header');
+            header.innerHTML = `
+                <div class="dimension-icon w-24 h-24 mx-auto mb-4 ${dimension.textColor} flex items-center justify-center">
+                    ${dimension.icon}
+                </div>
+                <h2 class="text-3xl font-bold ${dimension.textColor}">${dimension.title}</h2>
+                <p class="text-stone-500">${dimension.subtitle}</p>
+            `;
+            
+            const skillsList = document.getElementById('skills-list');
+            skillsList.innerHTML = '';
+            dimension.skills.forEach(skill => {
+                const skillItem = document.createElement('div');
+                skillItem.className = 'bg-white p-5 rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 cursor-pointer flex justify-between items-center';
+                skillItem.onclick = () => showSkillDetail(dimensionId, skill.id);
+                skillItem.innerHTML = `
+                    <div>
+                        <h4 class="font-semibold text-lg text-stone-800">${skill.title}</h4>
+                        <p class="text-stone-500 text-sm">${skill.description}</p>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                `;
+                skillsList.appendChild(skillItem);
+            });
+
+            showView('dimension-detail-view');
+        }
+
+        /**
+         * Renders the learning module for a specific skill.
+         * @param {string} dimensionId - The ID of the parent dimension.
+         * @param {string} skillId - The ID of the skill to display.
+         */
+        function showSkillDetail(dimensionId, skillId) {
+            currentState.selectedSkillId = skillId;
+            const dimension = idgData.dimensions.find(d => d.id === dimensionId);
+            const skill = dimension.skills.find(s => s.id === skillId);
+            
+            // Set the onclick for the "back to skills" button dynamically
+            document.getElementById('back-to-skills-btn').onclick = () => showDimensionDetail(dimensionId);
+
+            const content = document.getElementById('skill-content');
+            content.innerHTML = `
+                <h3 class="text-3xl font-bold ${dimension.textColor} mb-2">${skill.title}</h3>
+                <p class="text-stone-600 mb-6">${skill.description}</p>
+                
+                <div class="space-y-6">
+                    <!-- Micro-Practice Module -->
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h5 class="font-bold text-stone-700 mb-2">🌱 Micro-Practice</h5>
+                        <p class="text-stone-600">${skill.practice}</p>
+                    </div>
+                    
+                    <!-- Reflection Module -->
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h5 class="font-bold text-stone-700 mb-2">🤔 Reflective Question</h5>
+                        <p class="text-stone-600">${skill.reflection}</p>
+                    </div>
+                    
+                    <!-- AI Coach Module -->
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h5 class="font-bold text-stone-700 mb-3">🤖 AI Coach</h5>
+                        <div id="ai-coach-chat" class="space-y-3">
+                             <div class="flex justify-start">
+                                <div class="bg-stone-200 text-stone-800 p-3 rounded-lg max-w-xs">
+                                    <p>I'm here to support your development. How can I help you practice '${skill.title}' today?</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="askAICoach('${skill.coachPrompt}')" class="mt-4 w-full bg-amber-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-amber-900 transition-colors duration-300">
+                            Ask: "${skill.coachPrompt}"
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            showView('skill-detail-view');
+        }
+        
+        /**
+         * Simulates an interaction with the AI coach.
+         * Appends a user prompt and a pre-scripted AI response to the chat interface.
+         * @param {string} promptText - The user's question to the AI coach.
+         */
+        function askAICoach(promptText) {
+            const chat = document.getElementById('ai-coach-chat');
+            
+            // Append user's prompt
+            const userBubble = document.createElement('div');
+            userBubble.className = 'flex justify-end';
+            userBubble.innerHTML = `<div class="bg-sky-700 text-white p-3 rounded-lg max-w-xs"><p>${promptText}</p></div>`;
+            chat.appendChild(userBubble);
+            
+            // In a real app, this would be an API call. Here we simulate a response.
+            // This is a placeholder for a real LLM call.
+            const aiResponse = "This is a great question. Here is a simulated response designed to be helpful and encouraging, guiding you to reflect deeper on the topic. In a real application, I would provide a unique, context-aware answer based on your specific needs and our past conversations. Let's explore this together...";
+
+            // Simulate a slight delay for realism
+            setTimeout(() => {
+                const aiBubble = document.createElement('div');
+                aiBubble.className = 'flex justify-start';
+                aiBubble.innerHTML = `<div class="bg-stone-200 text-stone-800 p-3 rounded-lg max-w-xs"><p>${aiResponse}</p></div>`;
+                chat.appendChild(aiBubble);
+                // Scroll to the new message
+                chat.scrollTop = chat.scrollHeight;
+            }, 800);
+        }
+
+
+        // --- INITIALIZATION ---
+        // This function runs when the page loads, setting up the initial view.
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHomeView();
+        });
+
+    </script>
+</body>
+</html>
